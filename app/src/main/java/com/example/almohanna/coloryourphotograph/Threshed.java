@@ -1,6 +1,7 @@
 package com.example.almohanna.coloryourphotograph;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -26,6 +27,17 @@ public class Threshed extends Activity {
             }
         });
     }
+
+    public void showAlert(View view){
+        AlertDialog.Builder myAlert = new AlertDialog.Builder(this);
+        myAlert.setMessage("اهلا بك ياصغيري... " + System.getProperty("line.separator")
+                +"تستطيع من خلال الحد الاعلى والحد الادنى للخطوط " + System.getProperty("line.separator")
+                +"تحديد مستوى الصعوبة التي تريدها " +System.getProperty("line.separator")
+                + "اتمنى لك وقتاً ممتعاً ").create();
+        myAlert.show();
+
+    }
+
 
     /**
      * seekBar = (SeekBar)findViewById(R.id.seekbar_id);
