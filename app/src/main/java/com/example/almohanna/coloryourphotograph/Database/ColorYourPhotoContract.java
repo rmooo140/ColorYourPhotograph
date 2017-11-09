@@ -37,6 +37,5 @@ public class ColorYourPhotoContract {
         public final static String COLUMN_COLOR = "color";
         public final static int COLUMN_SIZE = 5;
 
-
     }
 }

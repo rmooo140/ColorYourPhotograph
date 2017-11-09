@@ -20,7 +20,7 @@ public class ColorYourPhotoDbHelper extends SQLiteOpenHelper {
     public static final String LOG_TAG = ColorYourPhotoDbHelper.class.getSimpleName();
 
     private static final String DATABASE_NAME = "ColorYourPhoto.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public ColorYourPhotoDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -33,18 +33,18 @@ public class ColorYourPhotoDbHelper extends SQLiteOpenHelper {
         Log.i(LOG_TAG, "in onCreate ");
 
         String CREATE_TABLE_Difficulty = "CREATE TABLE IF NOT EXISTS " + DifficultyEntry.TABLE_NAME +
-                "(" + DifficultyEntry.COLUMN_LEVEL + " TEXT NOT NULL);";
-        Log.v("ColorYourPhotoDbHelper", "create table: " + CREATE_TABLE_Difficulty);
+                " ( " + DifficultyEntry.COLUMN_LEVEL + " TEXT NOT NULL " + " ); ";
+
+        Log.v("ColorYourPhotoDbHelper", "create table:" + CREATE_TABLE_Difficulty);
         // Execute the SQL statement
         sqLiteDatabase.execSQL(CREATE_TABLE_Difficulty);
-        Log.i(LOG_TAG, "in onCreate SQLiteDatabase first table craeted successfully ");
+        Log.i(LOG_TAG, "in onCreate SQLiteDatabase first table craeted successfully");
 
         /////////////////////////////////////////////////////////////////////////
 
-
         // Create a String that contains the SQL statement to create the gallary table
         String CREATE_TABLE_Gallery = "CREATE TABLE IF NOT EXISTS " + GalleryEntry.TABLE_NAME +
-                "(" + GalleryEntry.COLUMN_COLORING_PAGE + " BLOB  );";
+        " ( " + GalleryEntry.COLUMN_COLORING_PAGE + " BLOB " + " ); ";
 
         Log.v("ColorYourPhotoDbHelper", "create table: " + CREATE_TABLE_Gallery);
         // Execute the SQL statement
@@ -55,9 +55,9 @@ public class ColorYourPhotoDbHelper extends SQLiteOpenHelper {
 
         // Create a String that contains the SQL statement to create the tools table
         String CREATE_TABLE_TOOLS = "CREATE TABLE IF NOT EXISTS " + ToolsEntry.TABLE_NAME +
-                "(" + ToolsEntry.COLUMN_NAME + " TEXT NOT NULL," +
-                ToolsEntry.COLUMN_COLOR + " TEXT NOT NULL," +
-                ToolsEntry.COLUMN_SIZE + " INTEGER NOT NULL);";
+                " ( " + ToolsEntry.COLUMN_NAME + " TEXT ," +
+                ToolsEntry.COLUMN_COLOR + " TEXT ," +
+                ToolsEntry.COLUMN_SIZE + " INTEGER " + " ); ";
 
         Log.v("ColorYourPhotoDbHelper", "create table: " + CREATE_TABLE_TOOLS);
         // Execute the SQL statement
@@ -75,14 +75,15 @@ public class ColorYourPhotoDbHelper extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
-    public void insertDifficultyLevel( String level) {
+    public void insertDifficultyLevel(String level) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(DifficultyEntry.COLUMN_LEVEL, level);
         db.insert(DifficultyEntry.TABLE_NAME, null, values);
+        //db.close();
     }
 
-    public void insertTools( String name,String color,int size) {
+    public void insertTools(String name, String color, int size) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(ToolsEntry.COLUMN_NAME, name);
@@ -91,7 +92,7 @@ public class ColorYourPhotoDbHelper extends SQLiteOpenHelper {
         db.insert(ToolsEntry.TABLE_NAME, null, values);
     }
 
-    public void insertImage( Byte bytes) {
+    public void insertImage(Byte bytes) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(String.valueOf(GalleryEntry.COLUMN_COLORING_PAGE), bytes);
@@ -100,9 +101,7 @@ public class ColorYourPhotoDbHelper extends SQLiteOpenHelper {
 
     public Cursor readLevel() {
         SQLiteDatabase db = getReadableDatabase();
-        String[] projection = {
-                DifficultyEntry.COLUMN_LEVEL,
-        };
+        String[] projection = {DifficultyEntry.COLUMN_LEVEL,};
         Cursor cursor = db.query(
                 DifficultyEntry.TABLE_NAME,
                 projection,

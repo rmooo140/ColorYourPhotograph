@@ -2,21 +2,43 @@ package com.example.almohanna.coloryourphotograph;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
-/**
- * Created by user on 27/09/17.
- */
 public class Confirmation extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.confirmation);
 
+        Bitmap photo = this.getIntent().getParcelableExtra("Bitmap");
+        ImageView viewPhoto = (ImageView) findViewById(R.id.img);
+        viewPhoto.setImageBitmap(photo);
 
-        // home button
+        //coloring intent
+        ImageView startColoring = (ImageView) findViewById(R.id.start_coloring);
+        startColoring.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent coloringIntent = new Intent(Confirmation.this, ColoringPage.class);
+                startActivity(coloringIntent);
+            }
+        });
+
+        //back button intent
+        ImageView backButton = (ImageView) findViewById(R.id.back);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent backIntent = new Intent(Confirmation.this, CameraOpen.class);
+                startActivity(backIntent);
+            }
+        });
+
+        // home button intent
         ImageButton home = (ImageButton) findViewById(R.id.home1);
         home.setOnClickListener(new View.OnClickListener() {
             @Override

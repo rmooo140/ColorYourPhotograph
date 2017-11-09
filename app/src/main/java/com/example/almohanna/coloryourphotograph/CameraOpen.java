@@ -3,17 +3,27 @@ package com.example.almohanna.coloryourphotograph;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.ImageView;
+import android.util.Log;
 
+import com.example.almohanna.coloryourphotograph.Database.ColorYourPhotoDbHelper;
+
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfDouble;
 import org.opencv.imgproc.Imgproc;
 
-import static android.graphics.Bitmap.createBitmap;
+import static com.example.almohanna.coloryourphotograph.Database.ColorYourPhotoContract.DifficultyEntry;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 
 public class CameraOpen extends AppCompatActivity {
@@ -21,66 +31,176 @@ public class CameraOpen extends AppCompatActivity {
     private static final String TAG = "CameraOpen";
 
     private static final int CAMERA_REQUEST = 1888;
-    private ImageView imageView;
     Bitmap photo;
     Bitmap imgBitmap;
-    private Mat inputMat;
+    private Mat inputMat = null;
+    Bitmap cannyImg;
+    ColorYourPhotoDbHelper DbHelper;
+    String difficultyLevel = "Easy";
+
+    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
+        @Override
+        public void onManagerConnected(int status) {
+            switch (status) {
+                case LoaderCallbackInterface.SUCCESS: {
+                    Log.i(TAG, "OpenCV loaded successfully");
+                    try {
+                        cannyImg = smoothingAndCannyEdgeDetection(photo);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+                default: {
+                    super.onManagerConnected(status);
+                }
+                break;
+            }
+        }
+    };
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!OpenCVLoader.initDebug()) {
+            Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
+            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0, this, mLoaderCallback);
+        } else {
+            Log.d(TAG, "OpenCV library found inside package. Using it!");
+            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.cameraopen);
 
-        this.imageView = (ImageView) this.findViewById(R.id.imagePreview);
-
+        DbHelper = new ColorYourPhotoDbHelper(this);
         Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(cameraIntent, CAMERA_REQUEST);
-
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             photo = (Bitmap) data.getExtras().get("data");
 
-            Bitmap biImg = canny(photo);
+            cannyImg = smoothingAndCannyEdgeDetection(photo);
+            Intent intent = new Intent();
 
-            imageView.setImageBitmap(biImg);
+            if (difficultyLevel.equals("Easy") || difficultyLevel.equals("Medium"))
+                intent.setClass(CameraOpen.this, Confirmation.class);
+            else
+                intent.setClass(CameraOpen.this, Threshed.class);
+
+            intent.putExtra("Bitmap", cannyImg);
+            startActivity(intent);
         }
     }
 
-    protected Bitmap canny(Bitmap img) {
+    protected Bitmap smoothingAndCannyEdgeDetection(Bitmap img) {
+        // Convert to an array
+        inputMat = new Mat();
+        Utils.bitmapToMat(img, inputMat);
 
-        inputMat = new Mat(photo.getWidth(), photo.getHeight(), CvType.CV_8UC4);
-        Utils.bitmapToMat(photo, inputMat);
-
+        // Smooth the image by applying Bilateral Filtering
         Mat BilateralFilterImg = applyBilateralFilter(inputMat);
-        Imgproc.cvtColor(inputMat, BilateralFilterImg, Imgproc.COLOR_RGB2GRAY);
-        Imgproc.adaptiveThreshold(BilateralFilterImg, inputMat, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 15, 5);
-        Utils.matToBitmap(inputMat, imgBitmap);
 
-        imgBitmap = Bitmap.createBitmap(inputMat.cols(), inputMat.rows(), Bitmap.Config.ARGB_8888);
+        // Convert it to a greyscale image
+        Mat greyImg = new Mat(BilateralFilterImg.size(), CvType.CV_8UC1);
+        Imgproc.cvtColor(BilateralFilterImg, greyImg, Imgproc.COLOR_RGB2GRAY);
+
+        // Detect edges using Canny Edge Detection
+        Mat edges = new Mat(greyImg.size(), CvType.CV_8UC1);
+        int[] thresholds = getCannyThresholds(greyImg);
+        Mat resultImg = Imgproc.Canny(greyImg, edges, thresholds[0], thresholds[1]);
+
+        // The result image should be black with white edges --> Flip colors
+        Imgproc.adaptiveThreshold(resultImg, edges, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 5, 10);
+
+        // Convert back to a Bitmap
+        imgBitmap = Bitmap.createBitmap(edges.cols(), edges.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(edges, imgBitmap);
+
         return imgBitmap;
     }
 
-    public Mat applyBilateralFilter(Mat mRgba) {
-        Mat result;
+    private Mat applyBilateralFilter(Mat src) {
         // convert 4 channel Mat to 3 channel Mat
-        Imgproc.cvtColor(mRgba, mRgba, Imgproc.COLOR_BGRA2BGR);
+        Imgproc.cvtColor(src, src, Imgproc.COLOR_RGBA2RGB);
 
-        // create dest Mat
-        Mat dstMat = mRgba.clone();
+        // create an empty matrix for the result
+        Mat dst = new Mat();
 
         // apply bilateral filter
-        Imgproc.bilateralFilter(mRgba, dstMat, 10, 250, 50);
+        Imgproc.bilateralFilter(src, dst, 5, 80, 80);
 
-        // convert to 4 channels Mat back
-        Imgproc.cvtColor(dstMat, dstMat, Imgproc.COLOR_RGB2RGBA);
-
-        // create result bitmap and convert Mat to it
-        Bitmap bm = createBitmap(mRgba.cols(), mRgba.rows(), Bitmap.Config.ARGB_8888);
-        Utils.bitmapToMat(bm, dstMat);
-
-        return dstMat;
-
+        return dst;
     }
+
+    private int[] getCannyThresholds(Mat greyImg) {
+
+        int[] thresholds = new int[2];
+
+        // Read difficulty level
+        Cursor cursor = DbHelper.readLevel();
+
+        int levelColumnIndex = cursor.getColumnIndex(DifficultyEntry.COLUMN_LEVEL);
+        // Iterate through all the returned rows in the cursor
+        while (cursor.moveToNext()) {
+            difficultyLevel = cursor.getString(levelColumnIndex);
+            Log.v(TAG, "level: " + difficultyLevel );
+        }
+
+        // Compute the mean and standard deviation for the image
+        MatOfDouble meanMat = new MatOfDouble();
+        MatOfDouble stdMat = new MatOfDouble();
+        Core.meanStdDev(greyImg, meanMat, stdMat);
+        double mean = meanMat.get(0, 0)[0];
+        double std = stdMat.get(0, 0)[0];
+
+        // Compute the thresholds
+        switch (difficultyLevel) {
+            case "Easy":
+                // the lower thresold
+                thresholds[0] = max(0, (int) (mean - std));
+                // the upper thresold
+                thresholds[1] = min(255, (int) (mean + std));
+                break;
+            case "Medium":
+                // the lower thresold
+                thresholds[0] = max(0, (int) (mean - 1.5 * std));
+                // the upper thresold
+                thresholds[1] = min(255, (int) (mean + 0.5 * std));
+                break;
+            case "Advanced":
+                // the lower thresold
+                thresholds[0] = (int) (mean);
+                // the upper thresold
+                thresholds[1] = min(255, (int) (mean + 2.0 * std));
+                break;
+        }
+        return thresholds;
+    }
+
+    /**
+     public Mat applyBilateralFilter(Mat mRgba) {
+     // convert 4 channel Mat to 3 channel Mat
+     Imgproc.cvtColor(mRgba, mRgba, Imgproc.COLOR_BGRA2BGR);
+
+     // create dest Mat
+     Mat dstMat = mRgba.clone();
+
+     // apply bilateral filter
+     Imgproc.bilateralFilter(mRgba, dstMat, 10, 250, 50);
+
+     // convert to 4 channels Mat back
+     Imgproc.cvtColor(dstMat, dstMat, Imgproc.COLOR_RGB2RGBA);
+
+     // create result bitmap and convert Mat to it
+     Bitmap bm = createBitmap(mRgba.cols(), mRgba.rows(), Bitmap.Config.ARGB_8888);
+     Utils.bitmapToMat(bm, dstMat);
+
+     return dstMat;
+     }**/
 }

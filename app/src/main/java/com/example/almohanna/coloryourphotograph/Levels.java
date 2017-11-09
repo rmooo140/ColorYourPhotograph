@@ -26,36 +26,35 @@ public class Levels extends Activity {
         Button meduim = (Button) findViewById(R.id.meduim);
         Button advance = (Button) findViewById(R.id.advance);
 
+        easy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                colorYourPhotoDbHelper.insertDifficultyLevel("Easy");
+                Log.i("level", "easy inseted to database successfully");
+                Intent homeIntent = new Intent(Levels.this, Home.class);
+                startActivity(homeIntent);
+            }
+        });
 
-        if (easy.isClickable()) {
-            easy.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    colorYourPhotoDbHelper.insertDifficultyLevel("easy");
-                    Log.i("level", "inseted to database successfully");
+        meduim.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                colorYourPhotoDbHelper.insertDifficultyLevel("Medium");
+                Log.i("level", "meduim inseted to database successfully");
+                Intent homeIntent = new Intent(Levels.this, Home.class);
+                startActivity(homeIntent);
+            }
+        });
 
-                }
-            });
-        } else
-            if (meduim.isClickable()) {
-            meduim.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    colorYourPhotoDbHelper.insertDifficultyLevel("meduim");
-                    Log.i("level", "inseted to database successfully");
-                }
-            });
-
-        }
-        else {
-            advance.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    colorYourPhotoDbHelper.insertDifficultyLevel("advance");
-                    Log.i("level", "inseted to database successfully");
-                }
-            });
-        }
+        advance.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                colorYourPhotoDbHelper.insertDifficultyLevel("Advanced");
+                Log.i("level", " advanced inseted to database successfully");
+                Intent homeIntent = new Intent(Levels.this, Home.class);
+                startActivity(homeIntent);
+            }
+        });
 
         // home button
         ImageButton home = (ImageButton) findViewById(R.id.home1);
@@ -66,7 +65,5 @@ public class Levels extends Activity {
                 startActivity(homeIntent);
             }
         });
-
     }
-
 }

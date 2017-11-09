@@ -7,12 +7,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 
+import com.example.almohanna.coloryourphotograph.Database.ColorYourPhotoDbHelper;
+
 public class Home extends AppCompatActivity {
 
+    ColorYourPhotoDbHelper DbHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        DbHelper= new ColorYourPhotoDbHelper(this);
+
 
         // difficulty Levels page
         Button difficultyLevels = (Button) findViewById(R.id.difficultyLevels);
