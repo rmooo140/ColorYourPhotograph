@@ -44,7 +44,7 @@ public class ColorYourPhotoDbHelper extends SQLiteOpenHelper {
 
         // Create a String that contains the SQL statement to create the gallary table
         String CREATE_TABLE_Gallery = "CREATE TABLE IF NOT EXISTS " + GalleryEntry.TABLE_NAME +
-        " ( " + GalleryEntry.COLUMN_COLORING_PAGE + " BLOB " + " ); ";
+                " ( " + GalleryEntry.COLUMN_COLORING_PAGE + " BLOB " + " ); ";
 
         Log.v("ColorYourPhotoDbHelper", "create table: " + CREATE_TABLE_Gallery);
         // Execute the SQL statement
@@ -92,12 +92,13 @@ public class ColorYourPhotoDbHelper extends SQLiteOpenHelper {
         db.insert(ToolsEntry.TABLE_NAME, null, values);
     }
 
-    public void insertImage(Byte bytes) {
+    public void insertImage(byte[] bytes) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(String.valueOf(GalleryEntry.COLUMN_COLORING_PAGE), bytes);
         db.insert(GalleryEntry.TABLE_NAME, null, values);
     }
+
 
     public Cursor readLevel() {
         SQLiteDatabase db = getReadableDatabase();
