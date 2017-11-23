@@ -9,12 +9,13 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 public class Confirmation extends Activity {
+    Bitmap photo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.confirmation);
 
-        Bitmap photo = this.getIntent().getParcelableExtra("Bitmap");
+         photo = this.getIntent().getParcelableExtra("Bitmap");
         ImageView viewPhoto = (ImageView) findViewById(R.id.img);
         viewPhoto.setImageBitmap(photo);
 
@@ -23,8 +24,11 @@ public class Confirmation extends Activity {
         startColoring.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent coloringIntent = new Intent(Confirmation.this, ColoringPage.class);
-                startActivity(coloringIntent);
+                Intent intent = new Intent();
+                intent.setClass(Confirmation.this,ColoringPage.class);
+                intent.putExtra("Bitmap2",photo);
+                startActivity(intent);
+
             }
         });
 
