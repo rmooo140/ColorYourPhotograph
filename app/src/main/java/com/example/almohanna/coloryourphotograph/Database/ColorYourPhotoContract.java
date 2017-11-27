@@ -2,8 +2,6 @@ package com.example.almohanna.coloryourphotograph.Database;
 
 import android.provider.BaseColumns;
 
-import org.opencv.core.Mat;
-
 /**
  * Created by Reem on 12-Oct-17.
  */
@@ -25,7 +23,7 @@ public class ColorYourPhotoContract {
 
         public final static String TABLE_NAME = "Gallery";
         //public final static String _ID = BaseColumns._ID;
-        public final static Mat COLUMN_COLORING_PAGE = null;
+        public final static String COLUMN_COLORING_PAGE = "image";
 
     }
 

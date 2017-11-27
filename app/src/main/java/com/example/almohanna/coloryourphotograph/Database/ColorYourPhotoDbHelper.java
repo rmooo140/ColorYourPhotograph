@@ -95,7 +95,7 @@ public class ColorYourPhotoDbHelper extends SQLiteOpenHelper {
     public void insertImage(byte[] bytes) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(String.valueOf(GalleryEntry.COLUMN_COLORING_PAGE), bytes);
+        values.put(GalleryEntry.COLUMN_COLORING_PAGE, bytes);
         db.insert(GalleryEntry.TABLE_NAME, null, values);
     }
 
