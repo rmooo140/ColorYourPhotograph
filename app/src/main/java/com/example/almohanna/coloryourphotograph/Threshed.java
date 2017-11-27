@@ -8,20 +8,69 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.SeekBar;
 
-/**
- * Created by user on 27/09/17.
- */
+
 public class Threshed extends Activity {
+
+    public CameraOpen c;
+    public ImageView viewPhoto;
+    public int lower;
+    public int upper;
+    public Bitmap photo;
+    public SeekBar upperSeekBar;
+    public SeekBar lowerSeekBar;
+    public Bitmap result;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.threshed);
 
-        Bitmap photo = this.getIntent().getParcelableExtra("Bitmap");
-        ImageView viewPhoto = (ImageView) findViewById(R.id.img);
+        c = new CameraOpen();
+        photo = this.getIntent().getParcelableExtra("Bitmap");
+        viewPhoto = (ImageView) findViewById(R.id.img);
         viewPhoto.setImageBitmap(photo);
+
+        upperSeekBar = (SeekBar) findViewById(R.id.seekBar1);
+        lowerSeekBar = (SeekBar) findViewById(R.id.seekBar2);
+
+        // perform lower seek bar change listener event used for getting the progress value
+        lowerSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int lowerSeekbarProgressChangedValue = 0;
+
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                lowerSeekbarProgressChangedValue = progress;
+            }
+
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            public void onStopTrackingTouch(SeekBar seekBar) {
+               // Toast.makeText(Threshed.this, "Seek bar progress is :" + lowerSeekbarProgressChangedValue, Toast.LENGTH_SHORT).show();
+                //lower = lowerSeekBar.getProgress();
+                lower = lowerSeekbarProgressChangedValue;
+            }
+        });
+
+        // perform upper seek bar change listener event used for getting the progress value
+        upperSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int upperSeekbarProgressChangedValue = 0;
+
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                upperSeekbarProgressChangedValue = progress;
+                upper = upperSeekbarProgressChangedValue;
+            }
+
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            public void onStopTrackingTouch(SeekBar seekBar) {
+               // Toast.makeText(Threshed.this, "Seek bar progress is :" + upperSeekbarProgressChangedValue,Toast.LENGTH_SHORT).show();
+                //upper = upperSeekBar.getProgress();
+
+            }
+        });
 
         // home button
         ImageButton home = (ImageButton) findViewById(R.id.home1);
@@ -33,43 +82,26 @@ public class Threshed extends Activity {
             }
         });
 
-        // start coloring button
-        TextView startColoringButton = (TextView) findViewById(R.id.startColoringButton);
-        startColoringButton.setOnClickListener(new View.OnClickListener() {
+        ImageButton nextButton = (ImageButton) findViewById(R.id.next);
+        nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent coloringIntent = new Intent(Threshed.this, ColoringPage.class);
-                startActivity(coloringIntent);
+
+                result = c.CannyEdgeDetectionForSpecificThresholdsValues(photo, lower, upper);
+                Intent intent = new Intent();
+                intent.setClass(Threshed.this, Confirmation.class);
+                intent.putExtra("Bitmap", result);
+                startActivity(intent);
             }
         });
-    }
+    }//end create
 
-    public void showAlert(View view){
+    public void showAlert(View view) {
         AlertDialog.Builder myAlert = new AlertDialog.Builder(this);
         myAlert.setMessage("اهلا بك ياصغيري... " + System.getProperty("line.separator")
-                +"تستطيع من خلال الحد الاعلى والحد الادنى للخطوط " + System.getProperty("line.separator")
-                +"تحديد مستوى الصعوبة التي تريدها " +System.getProperty("line.separator")
+                + "تستطيع من خلال الحد الاعلى والحد الادنى للخطوط " + System.getProperty("line.separator")
+                + "تحديد مستوى الصعوبة التي تريدها " + System.getProperty("line.separator")
                 + "اتمنى لك وقتاً ممتعاً ").create();
         myAlert.show();
-
     }
-
-
-/**
-    SeekBar upperSeekBar = (SeekBar)findViewById(R.id.seekBar1);
-    SeekBar lowerSeekBar = (SeekBar)findViewById(R.id.seekBar2);
-
-     seekBar.setMax(your_max_value);
-
-     onProgressChanged method
-
-     // I think this two variables should be out of the method
-     int limit = ((20 * 200) / 100);
-     int maxValue = seekBar.getMax();
-     if(seekBar.getProgress() >= (maxValue - limit)){
-     seekBar.setProgress(maxValue);
-     }else if(seekBar.getProgress() <= limit){
-     seekBar.setProgress(limit);
-     }
-     */
 }
