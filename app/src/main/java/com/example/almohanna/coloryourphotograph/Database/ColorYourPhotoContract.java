@@ -33,7 +33,7 @@ public class ColorYourPhotoContract {
         //public final static String _ID = BaseColumns._ID;
         public final static String COLUMN_NAME = "name";
         public final static String COLUMN_COLOR = "color";
-        public final static int COLUMN_SIZE = 5;
+        public final static String COLUMN_SIZE = "size" ;
 
     }
 }

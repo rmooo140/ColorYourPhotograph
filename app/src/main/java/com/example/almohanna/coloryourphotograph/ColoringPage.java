@@ -24,23 +24,23 @@ public class ColoringPage extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.coloringpage);
 
-        photo = (Bitmap)this.getIntent().getParcelableExtra("Bitmap2");
-        setContentView(R.layout.coloringpage);
-        viewPhoto = (ImageView)findViewById(R.id.img);
+        photo = this.getIntent().getParcelableExtra("Bitmap2");
+        viewPhoto = (ImageView) findViewById(R.id.img);
         viewPhoto.setImageBitmap(photo);
 
         // home button
         ImageButton home = (ImageButton) findViewById(R.id.home1);
         home.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
 
+            public void onClick(View v) {
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 photo.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte imageInByte[] = stream.toByteArray();
                 colorYourPhotoDbHelper.insertImage(imageInByte);
                 Log.i("images", "inserted to database successfully");
 
+               // Bitmap i = (Bitmap) imageInByte;
                 Intent homeIntent = new Intent(ColoringPage.this, Home.class);
                 startActivity(homeIntent);
             }
