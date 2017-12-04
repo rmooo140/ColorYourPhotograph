@@ -6,8 +6,11 @@ package com.example.almohanna.coloryourphotograph;
 
 public class Images {
 
-     byte[] img;
+    byte[] img;
 
+    // Empty constructor
+    public Images() {
+    }
 
     public Images(byte[] i) {
         this.img = i;
