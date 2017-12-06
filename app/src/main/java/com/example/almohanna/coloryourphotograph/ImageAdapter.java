@@ -18,11 +18,11 @@ import java.util.ArrayList;
  * Created by Reem on 23-Nov-17.
  */
 
-public class ImageAdapter extends ArrayAdapter<Images> {
+public class ImageAdapter extends ArrayAdapter<byte []> {
 
-    public ColorYourPhotoDbHelper DbHelper;
+    public ColorYourPhotoDbHelper DbHelper = new ColorYourPhotoDbHelper(this.getContext());
 
-    public ImageAdapter(Context context, ArrayList<Images> images) {
+    public ImageAdapter(Context context, ArrayList<byte []> images) {
         super(context, 0, images);
     }
 
@@ -55,19 +55,15 @@ public class ImageAdapter extends ArrayAdapter<Images> {
                     R.layout.gallery, parent, false);
         }
         ImageView imgView = (ImageView) listItemView.findViewById(R.id.img);
-
-        ImageView dropIcon = (ImageView) listItemView.findViewById(R.id.drop);
-        ImageView brushIcon = (ImageView) listItemView.findViewById(R.id.brush);
-
-        ArrayList<Images> imagesList = DbHelper.retrieveAllImage();// Get all images
+        ArrayList<byte []> imagesList = DbHelper.retrieveAllImages();// Get all images
 
         for (int i = 0; i < imagesList.size(); i++) {
 
             //ImageView img = new ImageView(getContext());
-            Images retrivedImage= imagesList.get(i);
+            byte [] retrivedImage= imagesList.get(i);
 
-            byte[] outImage = retrivedImage.img;
-            ByteArrayInputStream imageStream = new ByteArrayInputStream(outImage);
+            //byte[] outImage = retrivedImage; //.img
+            ByteArrayInputStream imageStream = new ByteArrayInputStream(retrivedImage);
             Bitmap out = BitmapFactory.decodeStream(imageStream);
             imgView.setImageBitmap(out);
 

@@ -9,8 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
-import com.example.almohanna.coloryourphotograph.Images;
-
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 
@@ -27,8 +25,8 @@ public class ColorYourPhotoDbHelper extends SQLiteOpenHelper {
     public static final String LOG_TAG = ColorYourPhotoDbHelper.class.getSimpleName();
 
     private static final String DATABASE_NAME = "ColorYourPhoto.db";
-    private static final int DATABASE_VERSION = 3;
-    //private ArrayList<Images> listofImages;
+    private static final int DATABASE_VERSION = 4;
+    private ArrayList<byte []> listofImages= new ArrayList<byte []>();
 
     public ColorYourPhotoDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -89,7 +87,6 @@ public class ColorYourPhotoDbHelper extends SQLiteOpenHelper {
        // db.close();
     }
 
-
     public Cursor readLevel() {
         SQLiteDatabase db = getReadableDatabase();
         String[] projection = {DifficultyEntry.COLUMN_LEVEL,};
@@ -106,9 +103,8 @@ public class ColorYourPhotoDbHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public ArrayList<Images> retrieveAllImage() {
-        ArrayList<Images> listofImages= new ArrayList<Images>();
-
+    public ArrayList<byte []> retrieveAllImages() {
+        listofImages.clear();
         SQLiteDatabase db = this.getWritableDatabase();
         String[] projection = {GalleryEntry.COLUMN_COLORING_PAGE,};
         Cursor cursor = db.query(
@@ -120,13 +116,11 @@ public class ColorYourPhotoDbHelper extends SQLiteOpenHelper {
                 null,
                 null
         );
-        Images image = new Images();
-
         if(cursor != null) {
             if(cursor.moveToFirst()) {
                 do {
-                    image.setImg (cursor.getBlob(cursor.getColumnIndex(GalleryEntry.COLUMN_COLORING_PAGE)));
-                    listofImages.add(image);
+                    byte [] blob = cursor.getBlob(cursor.getColumnIndex(GalleryEntry.COLUMN_COLORING_PAGE));
+                    listofImages.add(blob);
                 }
                 while(cursor.moveToNext());
             }
@@ -171,5 +165,14 @@ public class ColorYourPhotoDbHelper extends SQLiteOpenHelper {
            // db.close();
         // db.execSQL(query);
     }
-
+/*
+    private int deleteOneItemFromTable(long itemId) {
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
+        String selection = StockContract.StockEntry._ID + "=?";
+        String[] selectionArgs = {String.valueOf(itemId)};
+        int rowsDeleted = database.delete(
+                StockContract.StockEntry.TABLE_NAME, selection, selectionArgs);
+        return rowsDeleted;
+    }
+*/
 }
