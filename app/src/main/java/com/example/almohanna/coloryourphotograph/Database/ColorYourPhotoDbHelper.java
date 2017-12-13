@@ -115,7 +115,7 @@ public class ColorYourPhotoDbHelper extends SQLiteOpenHelper {
 
                 do {
                     byte[] blob = cursor.getBlob(cursor.getColumnIndex(GalleryEntry.COLUMN_COLORING_PAGE));
-                   id.add(cursor.getString(cursor.getColumnIndex(GalleryEntry._ID)));
+                //   id.add(cursor.getString(cursor.getColumnIndex(GalleryEntry._ID)));
 
                     listofImages.add(blob);
                 }
