@@ -97,7 +97,6 @@ public class ColorYourPhotoDbHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<byte[]> retrieveAllImages() {
-        //listofImages.clear();
         SQLiteDatabase db = this.getWritableDatabase();
         String[] projection = {GalleryEntry.COLUMN_COLORING_PAGE,};
         Cursor cursor = db.query(
