@@ -102,7 +102,7 @@ public class ColorYourPhotoDbHelper extends SQLiteOpenHelper {
         String[] projection = {GalleryEntry.COLUMN_COLORING_PAGE,};
         Cursor cursor = db.query(
                 GalleryEntry.TABLE_NAME,
-                null,
+                projection,
                 null,
                 null,
                 null,
@@ -111,12 +111,11 @@ public class ColorYourPhotoDbHelper extends SQLiteOpenHelper {
         );
         if (cursor != null) {
             if (cursor.moveToFirst()) {
-                ArrayList<String> id = new ArrayList<>();
+                //ArrayList<String> id = new ArrayList<String>();
 
                 do {
                     byte[] blob = cursor.getBlob(cursor.getColumnIndex(GalleryEntry.COLUMN_COLORING_PAGE));
-                   id.add(cursor.getString(cursor.getColumnIndex(GalleryEntry._ID)));
-
+                    //id.add(cursor.getString(cursor.getColumnIndex(GalleryEntry._ID)));
                     listofImages.add(blob);
                 }
                 while (cursor.moveToNext());

@@ -10,8 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
-import com.example.almohanna.coloryourphotograph.Database.ColorYourPhotoDbHelper;
-
 import java.util.ArrayList;
 
 /**
@@ -21,11 +19,13 @@ import java.util.ArrayList;
 public class ImageAdapter extends ArrayAdapter<byte[]> {
 
     Context context;
-    public ColorYourPhotoDbHelper DbHelper = new ColorYourPhotoDbHelper(this.getContext());
+    ArrayList<byte[]> images;
+    //public ColorYourPhotoDbHelper DbHelper = new ColorYourPhotoDbHelper(this.getContext());
 
     public ImageAdapter(Context context, ArrayList<byte[]> images) {
         super(context, 0, images);
-        this.context=context;
+        this.context = context;
+        this.images = images;
     }
 
 
@@ -43,7 +43,7 @@ public class ImageAdapter extends ArrayAdapter<byte[]> {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                intent.setClass(context,ColoringPage.class);
+                intent.setClass(context, ColoringPage.class);
                 //intent.putExtra("Bitmap", photo );
                 context.startActivity(intent);
             }
@@ -52,16 +52,13 @@ public class ImageAdapter extends ArrayAdapter<byte[]> {
         deleteImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              //  DbHelper.DeleteImage(photo);
+                //  DbHelper.DeleteImage(photo);
                 Log.i("adapter", " image deleted from database successfully");
             }
         });
         ImageView imgView = (ImageView) listItemView.findViewById(R.id.img);
-        ArrayList<byte[]> imagesList = DbHelper.retrieveAllImages();// Get all images
-        for (int i = 0; i < imagesList.size(); i++) {
-            byte[] retrivedImage = imagesList.get(i);
-            imgView.setImageBitmap(BitmapFactory.decodeByteArray(retrivedImage, 0, retrivedImage.length));
-        }
+        byte[] retrivedImage = images.get(position);
+        imgView.setImageBitmap(BitmapFactory.decodeByteArray(retrivedImage, 0, retrivedImage.length));
         return listItemView;
     }
 }
