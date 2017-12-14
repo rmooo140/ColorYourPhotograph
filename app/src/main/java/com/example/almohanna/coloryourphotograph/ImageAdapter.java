@@ -23,7 +23,7 @@ public class ImageAdapter extends ArrayAdapter<byte[]> {
 
     Context context;
     ArrayList<byte[]> images;
-    Bitmap imgBitmap;
+  //  Bitmap imgBitmap;
     ColorYourPhotoDbHelper DbHelper = new ColorYourPhotoDbHelper(this.getContext());
 
     public ImageAdapter(Context context, ArrayList<byte[]> images) {
@@ -42,24 +42,29 @@ public class ImageAdapter extends ArrayAdapter<byte[]> {
 
         ImageView imgView = (ImageView) listItemView.findViewById(R.id.img);
         byte[] retrivedImage = images.get(position);
-        imgBitmap = BitmapFactory.decodeByteArray(retrivedImage, 0, retrivedImage.length);
-        imgView.setImageBitmap(imgBitmap);
-
-        ImageView coloringPage = (ImageView) listItemView.findViewById(R.id.brush);
-        coloringPage.setOnClickListener(new View.OnClickListener() {
+    //    imgBitmap = BitmapFactory.decodeByteArray(retrivedImage, 0, retrivedImage.length);
+      //  imgView.setImageBitmap(imgBitmap);
+          Bitmap tempBitmap = BitmapFactory.decodeByteArray(retrivedImage,0,retrivedImage.length);
+          imgView.setImageBitmap(tempBitmap);
+          ImageView coloringPage = (ImageView) listItemView.findViewById(R.id.brush);
+          coloringPage.setTag(tempBitmap);
+          coloringPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.setClass(context, ColoringPage.class);
-                intent.putExtra("Bitmap2", imgBitmap);
+                //intent.putExtra("Bitmap2", imgBitmap);
+                intent.putExtra("Bitmap2",(Bitmap)v.getTag());
                 context.startActivity(intent);
             }
         });
         ImageView deleteImage = (ImageView) listItemView.findViewById(R.id.drop);
+        deleteImage.setTag(tempBitmap);
         deleteImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DbHelper.DeleteImage(imgBitmap);
+                //DbHelper.DeleteImage(imgBitmap);
+                DbHelper.DeleteImage((Bitmap)v.getTag());
                 Log.i("adapter", " image deleted from database successfully");
             }
         });
