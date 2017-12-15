@@ -184,9 +184,9 @@ public class ColoringPage extends Activity implements OnClickListener {
             //save drawing
 
             AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
-            saveDialog.setTitle("Save drawing");
-            saveDialog.setMessage("Save drawing to device Gallery?");//"Save drawing to device Gallery?"
-            saveDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            saveDialog.setTitle("حفظ الصورة");
+            saveDialog.setMessage("هل تود حفظ الصورة في جهازك؟");//"Save drawing to device Gallery?"
+            saveDialog.setPositiveButton("موافق", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     //save drawing
 
@@ -239,17 +239,17 @@ public class ColoringPage extends Activity implements OnClickListener {
 
                     if (imgSaved != null) {
                         Toast savedToast = Toast.makeText(getApplicationContext(),
-                                "Drawing saved to Gallery!", Toast.LENGTH_SHORT);
+                                "تم حفظ الصورة في جهازك بنجاج ", Toast.LENGTH_SHORT);
                         savedToast.show();
                     } else {
                         Toast unsavedToast = Toast.makeText(getApplicationContext(),
-                                "Oops! Image could not be saved.", Toast.LENGTH_SHORT);
+                                "نعتز حصل خطاء في حفظ الصورة حاول مرة خرى", Toast.LENGTH_SHORT);
                         unsavedToast.show();
                     }
                     drawView.destroyDrawingCache();
                 }
             });
-            saveDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            saveDialog.setNegativeButton("الغاء", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.cancel();
                 }
