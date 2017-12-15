@@ -71,6 +71,20 @@ public class ColorYourPhotoDbHelper extends SQLiteOpenHelper {
         db.insert(ToolsEntry.TABLE_NAME, null, values);
     }
 
+    public void insertColor(String color) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(ToolsEntry.COLUMN_COLOR, color);
+        db.insert(ToolsEntry.TABLE_NAME, null, values);
+    }
+
+    public void insertSize(int size) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(String.valueOf(ToolsEntry.COLUMN_SIZE), size);
+        db.insert(ToolsEntry.TABLE_NAME, null, values);
+    }
+
     public void insertImage(byte[] image) {
         SQLiteDatabase db = getWritableDatabase();
 
@@ -78,7 +92,6 @@ public class ColorYourPhotoDbHelper extends SQLiteOpenHelper {
         values.put(GalleryEntry.COLUMN_COLORING_PAGE, image);
         db.insert(GalleryEntry.TABLE_NAME, null, values);
     }
-
 
     public Cursor readLevel() {
         SQLiteDatabase db = getReadableDatabase();
@@ -94,6 +107,8 @@ public class ColorYourPhotoDbHelper extends SQLiteOpenHelper {
         );
         return cursor;
     }
+
+
 
     public Cursor readImage() {
         SQLiteDatabase db = getReadableDatabase();

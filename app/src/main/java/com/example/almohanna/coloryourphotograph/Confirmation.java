@@ -9,7 +9,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 public class Confirmation extends Activity {
-    Bitmap photo;
+    static Bitmap photo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,4 +52,6 @@ public class Confirmation extends Activity {
             }
         });
     }
+
+
 }
