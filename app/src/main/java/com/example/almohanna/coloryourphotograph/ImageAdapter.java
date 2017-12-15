@@ -1,62 +1,74 @@
 package com.example.almohanna.coloryourphotograph;
 
-import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
-import java.io.ByteArrayInputStream;
+import com.example.almohanna.coloryourphotograph.Database.ColorYourPhotoDbHelper;
+
 import java.util.ArrayList;
 
 /**
  * Created by Reem on 23-Nov-17.
  */
 
-public class ImageAdapter extends ArrayAdapter<Images> {
+public class ImageAdapter extends ArrayAdapter<byte[]> {
 
     Context context;
-    int layoutResourceId;
-    ArrayList<Images> data=new ArrayList<Images>();
-    public ImageAdapter(Context context, int layoutResourceId, ArrayList<Images> data) {
-        super(context, layoutResourceId, data);
-        this.layoutResourceId = layoutResourceId;
+    ArrayList<byte[]> images;
+  //  Bitmap imgBitmap;
+    ColorYourPhotoDbHelper DbHelper = new ColorYourPhotoDbHelper(this.getContext());
+
+    public ImageAdapter(Context context, ArrayList<byte[]> images) {
+        super(context, 0, images);
         this.context = context;
-        this.data = data;
+        this.images = images;
     }
 
-    @Override
+    //retriva all images
     public View getView(int position, View convertView, ViewGroup parent) {
-        View row = convertView;
-        ImageHolder holder = null;
-        if(row == null)
-        {
-            LayoutInflater inflater = ((Activity)context).getLayoutInflater();
-            row = inflater.inflate(layoutResourceId, parent, false);
-            holder = new ImageHolder();
-            holder.imgIcon = (ImageView)row.findViewById(R.id.imgIcon);
-            row.setTag(holder);
+        View listItemView = convertView;
+        if (listItemView == null) {
+            listItemView = LayoutInflater.from(getContext()).inflate(
+                    R.layout.gallery, parent, false);
         }
-        else
-        {
-            holder = (ImageHolder)row.getTag();
-        }
-        Images picture = data.get(position);
-        //holder.txtTitle.setText(picture ._name);
-//convert byte to bitmap take from contact class
-        byte[] outImage=picture.img;
-        ByteArrayInputStream imageStream = new ByteArrayInputStream(outImage);
-        Bitmap theImage = BitmapFactory.decodeStream(imageStream);
-        holder.imgIcon.setImageBitmap(theImage);
-        return row;
-    }
-    static class ImageHolder
-    {
-        ImageView imgIcon;
+
+        ImageView imgView = (ImageView) listItemView.findViewById(R.id.img);
+        byte[] retrivedImage = images.get(position);
+    //    imgBitmap = BitmapFactory.decodeByteArray(retrivedImage, 0, retrivedImage.length);
+      //  imgView.setImageBitmap(imgBitmap);
+          Bitmap tempBitmap = BitmapFactory.decodeByteArray(retrivedImage,0,retrivedImage.length);
+          imgView.setImageBitmap(tempBitmap);
+          ImageView coloringPage = (ImageView) listItemView.findViewById(R.id.brush);
+          coloringPage.setTag(tempBitmap);
+          coloringPage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setClass(context, ColoringPage.class);
+                //intent.putExtra("Bitmap2", imgBitmap);
+                intent.putExtra("Bitmap2",(Bitmap)v.getTag());
+                context.startActivity(intent);
+            }
+        });
+        ImageView deleteImage = (ImageView) listItemView.findViewById(R.id.drop);
+        deleteImage.setTag(tempBitmap);
+        deleteImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //DbHelper.DeleteImage(imgBitmap);
+                DbHelper.DeleteImage((Bitmap)v.getTag());
+                Log.i("adapter", " image deleted from database successfully");
+            }
+        });
+        return listItemView;
     }
 }
 

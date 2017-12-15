@@ -1,13 +1,18 @@
 
 package com.example.almohanna.coloryourphotograph;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.almohanna.coloryourphotograph.Database.ColorYourPhotoDbHelper;
 
@@ -77,6 +82,34 @@ public class CameraOpen extends AppCompatActivity {
         setContentView(R.layout.cameraopen);
 
         DbHelper = new ColorYourPhotoDbHelper(this);
+
+        if(checkSelfPermission(Manifest.permission.CAMERA ) == PackageManager.PERMISSION_GRANTED){
+          invoked();
+        }
+        else {
+            String [] permissionRequ = {Manifest.permission.CAMERA};
+            requestPermissions(permissionRequ, CAMERA_REQUEST);
+        }
+
+
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == CAMERA_REQUEST){
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                invoked();
+            }
+            else{
+                Toast.makeText(this,"fali",Toast.LENGTH_LONG).show();
+            }
+        }
+
+    }
+
+    private void invoked (){
         Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(cameraIntent, CAMERA_REQUEST);
     }
